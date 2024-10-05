@@ -10,8 +10,8 @@ void merge_supp (size_t low, size_t mid, size_t hig, void** base, int (*compar)(
     void *temp1[len1], *temp2[len2];
 
     // filling temp arrays
-    for (size_t i = 0; i < len1; i++){ temp1[i] = base[n1 + i]; printf ("%d ", temp1[i]);} printf("\n");
-    for (size_t i = 0; i < len2; i++){ temp2[i] = base[n2 + i]; printf ("%d ", temp2[i]);} printf("\n");
+    for (size_t i = 0; i < len1; i++) temp1[i] = base[n1 + i];
+    for (size_t i = 0; i < len2; i++) temp2[i] = base[n2 + i];
 
     // sorting into original array
     size_t i = 0, i1 = 0, i2 = 0;
