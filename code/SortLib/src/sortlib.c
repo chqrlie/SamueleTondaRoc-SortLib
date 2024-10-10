@@ -71,8 +71,6 @@ size_t split (int low, int hig, void** base, size_t size, int (*compar)(const vo
 
     while (j < pivot)
     {
-        //printf(" %d -> [%d], %d -> [%d], %d -> [%d]\n",i ,*(int*)((*base) + (i * size)), j, *(int*)((*base) + (j * size)), pivot ,*(int*)((*base) + (pivot * size)));
-        //if (j > 20) break;
         if ((*compar)((*base) + (j * size), (*base) + (pivot * size)) < 0) 
         {
             i++;
@@ -92,7 +90,6 @@ void quick_sort_R (int low, int hig, void **base, size_t size, int (*compar)(con
 {
     if (low < hig)
     {
-        //printf ("za");
         int pivot = split (low, hig, base, size, compar);
         quick_sort_R (low, pivot - 1, base, size, compar);
         quick_sort_R (pivot + 1, hig, base, size, compar);
