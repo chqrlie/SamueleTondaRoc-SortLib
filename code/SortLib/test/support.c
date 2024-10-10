@@ -26,8 +26,9 @@ int cmp_int (const void* a,const void* b)
 
 char* create_char_arr (size_t len)
 {
-	char* arr = (char*) malloc (sizeof(char) * len);
-	for (size_t i = 0; i < len; i++) arr[i] = 'z' - i;
+	char* arr = (char*) malloc (sizeof(char) * len); 
+	srand (time (NULL));
+	for (size_t i = 0; i < len; i++) arr[i] = (char) 'a' + (rand() % 25);
 	return arr;
 }
 

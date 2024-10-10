@@ -1,5 +1,6 @@
 #include "support.h"
 #include "../src/sortlib.h"
+#include <time.h>
 
 #define MAX_SIZE 100
 
@@ -82,6 +83,7 @@ int cmp_field3 (const void* a, const void* b)
 
 void sort_records (FILE *infile, FILE *outfile, size_t field, size_t algo)
 {
+
 	// preparing the array 
 	size_t len = calc_csvFile_len (infile);
 	Line_ptr data = (Line_ptr) malloc (sizeof(Line) * len);
@@ -89,14 +91,18 @@ void sort_records (FILE *infile, FILE *outfile, size_t field, size_t algo)
 	// filling the array with data from file
 	gather_data (infile, &data);
 
-	printf ("sorting...");
+	printf ("sorting...\n");
+
 	// defining compare func
 	int (*cmp_func)(const void*, const void*) = field == 1 ? (*cmp_field1) : (field == 2 ? (*cmp_field2) : (*cmp_field3));	
 
 	// chosing sorting algorithm
+	__clock_t start = clock(), end;
 	if (algo == 1) merge_sort ((void**) &data, len, sizeof(Line), cmp_func);
 	else quick_sort ((void**) &data, len, sizeof(Line), cmp_func);
-	printf ("array sorted!\n\n");
+	end = clock();
+	double algo_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+	printf ("array sorted in %f seconds\n\n", algo_time);
 
 	// dumping the array data in an output file
 	write_data(outfile, &data, len);
@@ -120,7 +126,7 @@ int main (int argc, char **argv)
 	if (infile && outfile && (field > 0 && field < 4) && (algo > 0 && algo < 3)) 
 		sort_records (infile, outfile, field, algo);	
 	else 
-		printf("error in passed data: \"%s %s %s %ld %ld\"", argv[0], in_file_path, out_file_path, field, algo);	// info dump in case of error
+		printf("error in passed data: \"%s %s %s %ld %ld\"\n", argv[0], in_file_path, out_file_path, field, algo);	// info dump in case of error
 
 	return 0;
 }
