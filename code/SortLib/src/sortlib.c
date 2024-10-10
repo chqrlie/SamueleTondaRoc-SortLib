@@ -56,12 +56,47 @@ void merge_sort (void **base, size_t nitems, size_t size, int (*compar)(const vo
 		merge_sort_R (0, nitems - 1, base, size, compar);
 }
 
+void swap (void *a, void *b, size_t size)
+{
+    void *temp = (void*) malloc (size);
+    memcpy (temp, a, size);
+    memcpy (a, b, size);
+    memcpy (b, temp, size);
+    free (temp);
+}
+
+size_t split (int low, int hig, void** base, size_t size, int (*compar)(const void*, const void*))
+{
+    int i = low - 1, j = low, pivot = hig;
+
+    while (j < pivot)
+    {
+        //printf(" %d -> [%d], %d -> [%d], %d -> [%d]\n",i ,*(int*)((*base) + (i * size)), j, *(int*)((*base) + (j * size)), pivot ,*(int*)((*base) + (pivot * size)));
+        //if (j > 20) break;
+        if ((*compar)((*base) + (j * size), (*base) + (pivot * size)) < 0) 
+        {
+            i++;
+            swap ((*base) + (i * size), (*base) + (j * size), size);
+        }
+        j++;
+    }
+    swap ((*base) + ((i + 1) * size), (*base) + (pivot* size), size);
+    pivot = i + 1;
+    return pivot;
+}
+
 /*
     @brief recursive method for the quick sort
 */
-void quick_sort_R ()
+void quick_sort_R (int low, int hig, void **base, size_t size, int (*compar)(const void*, const void*))
 {
-
+    if (low < hig)
+    {
+        //printf ("za");
+        int pivot = split (low, hig, base, size, compar);
+        quick_sort_R (low, pivot - 1, base, size, compar);
+        quick_sort_R (pivot + 1, hig, base, size, compar);
+    }
 }
 
 /*
@@ -74,5 +109,6 @@ void quick_sort_R ()
 */
 void quick_sort (void **base, size_t nitems, size_t size, int (*compar)(const void*, const void*)) 
 {
-
+    if (base && *base && compar && nitems)
+        quick_sort_R (0, nitems - 1, base, size, compar);
 }
