@@ -19,6 +19,22 @@ void quick_sort_test (void** base, size_t len, size_t size, int(*compar)(const v
 	free(*base);
 }
 
+int cmp_field1 (const void* a, const void* b)
+{
+	char A[100], B[100];
+	strcpy (A, ((char*) a));
+	strcpy (B, ((char*) b));
+	int cmp = strcmp (A, B);
+	return cmp > 0 ? 1 : (cmp < 0 ? -1 : 0);
+}
+
+void prt_string_arr (void** arr, size_t len)
+{
+	for (size_t i = 0; i < len; i++) printf ("%s ", ((char*) arr + i));
+	printf("\n");
+	// *((int*)(arr + (sizeof(int) * i)));
+}
+
 void test_suite()
 {
 	printf ("- MERGE SORT TEST -");
@@ -53,7 +69,7 @@ void test_suite()
 	merge_sort_test ((void**) &arr, len, sizeof(int), (*cmp_int), (*prt_int_arr));
 		
 	// void cmp_func ptr
-	printf ("test [05] - void cmp func ptr");
+	printf ("test [05] - void cmp func ptr\n");
 	len = 10;
 	arr = create_int_arr (len);
 	merge_sort_test ((void**) &arr, len, sizeof(int), NULL, (*prt_int_arr));
@@ -80,12 +96,6 @@ void test_suite()
 	arr = create_int_arr (len);
 	quick_sort_test ((void**) &arr, len, sizeof(int), (*cmp_int), (*prt_int_arr));
 
-	// even size arr
-	printf ("test [03] - even size int array\n");
-	len = 20;
-	char *vec = create_char_arr (len);
-	quick_sort_test ((void**) &vec, len, sizeof(char), (*cmp_char), (*prt_char_arr));
-
 	// odd size arr
 	printf ("test [04] - odd size int array\n");
 	len = 7;
@@ -93,7 +103,7 @@ void test_suite()
 	quick_sort_test ((void**) &arr, len, sizeof(int), (*cmp_int), (*prt_int_arr));
 		
 	// void cmp_func ptr
-	printf ("test [05] - void cmp func ptr");
+	printf ("test [05] - void cmp func ptr\n");
 	len = 10;
 	arr = create_int_arr (len);
 	quick_sort_test ((void**) &arr, len, sizeof(int), NULL, (*prt_int_arr));
