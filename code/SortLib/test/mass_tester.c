@@ -1,5 +1,6 @@
 #include "support.h"
 #include "../src/sortlib.h"
+#include <stdint.h>
 #include <time.h>
 
 #define MAX_SIZE 100
@@ -15,6 +16,8 @@ size_t calc_csvFile_len (FILE *file)
 {
 	size_t len = 0;
 	printf ("calculating file lenght...\n");
+	__clock_t start = clock(), end;
+
 	while (!feof(file))
 	{
 		
@@ -22,7 +25,10 @@ size_t calc_csvFile_len (FILE *file)
 		fscanf (file, "%[^\n]\n", s);
 		len++;
 	}
-	printf ("file lenght: %ld\n\n", len);
+
+	end = clock();
+	double algo_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+	printf ("file lenght: %ld\nTook: %fsec\n\n", len, algo_time);
 
 	fseek (file, 0L, SEEK_SET);
 	return len;
@@ -35,6 +41,8 @@ void gather_data (FILE *infile, Line_ptr *data)
 	float field3;
 
 	printf ("reading data...\n");
+	__clock_t start = clock(), end;
+
 	for (size_t i = 0; !feof (infile); i++)
 	{
 		fscanf (infile, "%d,%[^,],%d,%f\n", &id, field1, &field2, &field3);
@@ -44,18 +52,34 @@ void gather_data (FILE *infile, Line_ptr *data)
 		(*data)[i].field3 = field3;
 	}
 	fclose (infile);
-	printf ("data loading complete!\n\n");
+
+	end = clock();
+	double algo_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+	printf ("data loading complete!\nTook: %fsec\n\n", algo_time);
 }
 
 void write_data (FILE *outfile, Line_ptr *data, size_t len)
 {
 	printf ("writing data...\n");
+	__clock_t start = clock(), end;
+	
 	for (size_t i = 0; i < len; i++)
 	{
 		fprintf (outfile, "%d,%s,%d,%f\n", (*data)[i].id, (*data)[i].field1, (*data)[i].field2, (*data)[i].field3);
 	}
 	fclose (outfile);
-	printf ("data writing complete!\n\n");
+
+	end = clock();
+	double algo_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+	printf ("data writing complete!\nTook: %fsec\n\n", algo_time);
+}
+
+size_t fnv_1a_hash(const char *str) {
+    uint32_t hash = 2166136261;
+    while (*str) {
+        hash = (hash ^ *str++) * 16777219;
+    }
+    return hash;
 }
 
 int cmp_field1 (const void* a, const void* b)

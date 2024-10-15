@@ -1,5 +1,7 @@
 #include "sortlib.h"
 
+#define BASE(i) (*base) + ((i) * size)
+
 /*
     @brief support method for merge_sort_R
 */
@@ -11,15 +13,15 @@ void merge_supp (size_t low, size_t mid, size_t hig, void** base, size_t size, i
 	void* temp2 = (void*) malloc (size * len2);
 
     // filling temp arrays
-	for (size_t i = 0; i < len1; i++) memcpy (temp1 + (i * size), (*base) + ((n1 + i) * size), size);
-	for (size_t i = 0; i < len2; i++) memcpy (temp2 + (i * size), (*base) + ((n2 + i) * size), size);
+	for (size_t i = 0; i < len1; i++) memcpy (temp1 + (i * size), BASE (n1 + i), size);
+	for (size_t i = 0; i < len2; i++) memcpy (temp2 + (i * size), BASE (n2 + i), size);
 
     // sorting into original array
 	size_t i = 0, i1 = 0, i2 = 0;
 	while (i < len1 + len2)
 	{
 		int cmp = i1 < len1 ? (i2 < len2 ? (*compar)(temp1 + (i1 * size), temp2 + (i2 * size)) : -1) : 1;
-		memcpy ((*base) + ((low + i) * size), (cmp == -1 ? (temp1 + (i1 * size)) : (temp2 + (i2 * size))), size);
+		memcpy (BASE (low + i), (cmp == -1 ? (temp1 + (i1 * size)) : (temp2 + (i2 * size))), size);
 		i++; i1 += cmp == -1; i2 += cmp >= 0;
 	}
 
@@ -67,20 +69,21 @@ void swap (void *a, void *b, size_t size)
 
 size_t split (int low, int hig, void** base, size_t size, int (*compar)(const void*, const void*))
 {
-    int i = low - 1, j = low, pivot = hig;
+    int i = low - 1, j = low, mid = low + ((hig - low) / 2), pivot = hig;
+    
+    if (!((*compar)(BASE (low), BASE (mid)) + (*compar)(BASE (low), BASE (hig)))) swap (BASE (low), BASE (hig), size);
+    else if (!((*compar)(BASE (mid), BASE (low)) + (*compar)(BASE (mid), BASE (hig)))) swap (BASE (mid), BASE (hig), size);
 
-    while (j < pivot)
+    while (j < hig)
     {
-        //printf(" %d -> [%d], %d -> [%d], %d -> [%d]\n",i ,*(int*)((*base) + (i * size)), j, *(int*)((*base) + (j * size)), pivot ,*(int*)((*base) + (pivot * size)));
-        //if (j > 20) break;
-        if ((*compar)((*base) + (j * size), (*base) + (pivot * size)) < 0) 
+        if ((*compar)(BASE (j), BASE (pivot)) < 0) 
         {
             i++;
-            swap ((*base) + (i * size), (*base) + (j * size), size);
+            swap (BASE (i), BASE (j), size);
         }
         j++;
     }
-    swap ((*base) + ((i + 1) * size), (*base) + (pivot* size), size);
+    swap (BASE (i + 1), BASE (pivot), size);
     pivot = i + 1;
     return pivot;
 }
@@ -92,7 +95,6 @@ void quick_sort_R (int low, int hig, void **base, size_t size, int (*compar)(con
 {
     if (low < hig)
     {
-        //printf ("za");
         int pivot = split (low, hig, base, size, compar);
         quick_sort_R (low, pivot - 1, base, size, compar);
         quick_sort_R (pivot + 1, hig, base, size, compar);
