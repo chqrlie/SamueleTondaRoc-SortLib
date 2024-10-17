@@ -1,5 +1,6 @@
 #include "../src/sortlib.h"
 #include <stdint.h>
+#include <assert.h>
 #include <time.h>
 
 #define MAX_SIZE 100
@@ -93,6 +94,15 @@ int cmp_field3 (const void* a, const void* b)
 	return A < B ? -1 : (A == B ? 0 : 1);
 }
 
+// Helper function to check if array is sorted
+int is_sorted(void *array, size_t nitems, size_t size, int (*compar)(const void*, const void*)) 
+{
+    for (size_t i = 1; i < nitems; i++)
+        if (compar(((array) + ((i - 1) * size)), ((array) + ((i) * size))) > 0)
+			return 0; // Not sorted
+    return 1; // Sorted
+}
+
 void sort_records (FILE *infile, FILE *outfile, size_t field, size_t algo)
 {
 
@@ -114,6 +124,7 @@ void sort_records (FILE *infile, FILE *outfile, size_t field, size_t algo)
 	else quick_sort (data, len, sizeof(Line), cmp_func);
 	end = clock();
 	double algo_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+	assert (is_sorted(data, len, sizeof(Line), cmp_func));
 	printf ("array sorted in %.2f seconds\n\n", algo_time);
 
 	// dumping the array data in an output file
