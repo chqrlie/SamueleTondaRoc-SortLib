@@ -86,7 +86,6 @@ void quick_sort_R (int low, int hig, void *base, size_t size, int (*compar)(cons
     if (low < hig)
     {
         int pivot = split (low, hig, base, size, compar, temp);
-        
         quick_sort_R (low, pivot - 1, base, size, compar, temp);
         quick_sort_R (pivot + 1, hig, base, size, compar, temp);
     }
