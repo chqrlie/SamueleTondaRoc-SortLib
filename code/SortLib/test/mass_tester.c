@@ -1,4 +1,3 @@
-#include "support.h"
 #include "../src/sortlib.h"
 #include <stdint.h>
 #include <time.h>
@@ -18,17 +17,12 @@ size_t calc_csvFile_len (FILE *file)
 	printf ("calculating file lenght...\n");
 	__clock_t start = clock(), end;
 
-	while (!feof(file))
-	{
-		
 		char s[MAX_SIZE];
-		fscanf (file, "%[^\n]\n", s);
-		len++;
-	}
+	while(fscanf (file, " %99[^\n]", s) == 1) len++;
 
 	end = clock();
 	double algo_time = ((double)(end - start)) / CLOCKS_PER_SEC;
-	printf ("file lenght: %ld\nTook: %fsec\n\n", len, algo_time);
+	printf ("file lenght: %ld\nTook: %.2fsec\n\n", len, algo_time);
 
 	fseek (file, 0L, SEEK_SET);
 	return len;
@@ -55,7 +49,7 @@ void gather_data (FILE *infile, Line_ptr *data)
 
 	end = clock();
 	double algo_time = ((double)(end - start)) / CLOCKS_PER_SEC;
-	printf ("data loading complete!\nTook: %fsec\n\n", algo_time);
+	printf ("data loading complete!\nTook: %.2fsec\n\n", algo_time);
 }
 
 void write_data (FILE *outfile, Line_ptr *data, size_t len)
@@ -71,23 +65,16 @@ void write_data (FILE *outfile, Line_ptr *data, size_t len)
 
 	end = clock();
 	double algo_time = ((double)(end - start)) / CLOCKS_PER_SEC;
-	printf ("data writing complete!\nTook: %fsec\n\n", algo_time);
-}
-
-size_t fnv_1a_hash(const char *str) {
-    uint32_t hash = 2166136261;
-    while (*str) {
-        hash = (hash ^ *str++) * 16777219;
-    }
-    return hash;
+	printf ("data writing complete!\nTook: %.2fsec\n\n", algo_time);
 }
 
 int cmp_field1 (const void* a, const void* b)
 {
-	char A[MAX_SIZE], B[MAX_SIZE];
-	strcpy (A, ((Line_ptr) a) -> field1);
-	strcpy (B, ((Line_ptr) b) -> field1);
-	int cmp = strcmp (A, B);
+	//char A[MAX_SIZE], B[MAX_SIZE];
+	//strcpy (A, ((Line_ptr) a) -> field1);
+	//strcpy (B, ((Line_ptr) b) -> field1);
+	//int cmp = strcmp (A, B);
+	int cmp = strcmp (((Line_ptr) a) -> field1, ((Line_ptr) b) -> field1);
 	return cmp > 0 ? 1 : (cmp < 0 ? -1 : 0);
 }
 
@@ -95,6 +82,7 @@ int cmp_field2 (const void* a, const void* b)
 {
 	int A = ((Line_ptr) a) -> field2;
 	int B = ((Line_ptr) b) -> field2;
+	//printf ("%d %d\n", A, B);
 	return A < B ? -1 : (A == B ? 0 : 1);
 }
 
@@ -122,11 +110,11 @@ void sort_records (FILE *infile, FILE *outfile, size_t field, size_t algo)
 
 	// chosing sorting algorithm
 	__clock_t start = clock(), end;
-	if (algo == 1) merge_sort ((void**) &data, len, sizeof(Line), cmp_func);
-	else quick_sort ((void**) &data, len, sizeof(Line), cmp_func);
+	if (algo == 1) merge_sort (data, len, sizeof(Line), cmp_func);
+	else quick_sort (data, len, sizeof(Line), cmp_func);
 	end = clock();
 	double algo_time = ((double)(end - start)) / CLOCKS_PER_SEC;
-	printf ("array sorted in %f seconds\n\n", algo_time);
+	printf ("array sorted in %.2f seconds\n\n", algo_time);
 
 	// dumping the array data in an output file
 	write_data(outfile, &data, len);
@@ -138,8 +126,8 @@ int main (int argc, char **argv)
 	// reading command
 	char* in_file_path = argv[1];
 	char* out_file_path = argv[2];
-	size_t field = (int) (*argv[3] - '0'),
-			algo = (int) (*argv[4] - '0');
+	size_t field = (size_t) (*argv[3] - '0'),
+			algo = (size_t) (*argv[4] - '0');
 
 	// opening files (the closing happens in the gather_data and write_data methods)
 	FILE *infile = NULL, *outfile = NULL;
